@@ -217,6 +217,37 @@ Examples:
         help="Output format"
     )
 
+    # === scan command (NEW) ===
+    scan_parser = subparsers.add_parser(
+        "scan",
+        help="🔍 Scan AI Agent Skill files for security vulnerabilities",
+        description="Security scanner for AI Agent skills, MCP tools, and code files"
+    )
+    scan_parser.add_argument(
+        "path",
+        help="Path to file or directory to scan"
+    )
+    scan_parser.add_argument(
+        "--format",
+        choices=["terminal", "json", "markdown", "sarif"],
+        default="terminal",
+        help="Output format (default: terminal)"
+    )
+    scan_parser.add_argument(
+        "--output", "-o",
+        help="Output file path (default: print to terminal)"
+    )
+    scan_parser.add_argument(
+        "--no-recursive",
+        action="store_true",
+        help="Do not scan subdirectories"
+    )
+    scan_parser.add_argument(
+        "--severity",
+        choices=["CRITICAL", "HIGH", "MEDIUM", "LOW"],
+        help="Only show issues at or above this severity level"
+    )
+
     return parser
 
 
@@ -261,6 +292,10 @@ def main() -> int:
             from src.audit.history import HistoryManager
             manager = HistoryManager()
             return manager.handle(args)
+
+        elif args.subcommand == "scan":
+            from src.core.scanner import run_scan
+            return run_scan(args)
 
         else:
             parser.print_help()
